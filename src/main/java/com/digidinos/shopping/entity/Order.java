@@ -23,6 +23,9 @@ public class Order implements Serializable {
 	@Column(name = "Order_Date", nullable = false)
 	private Date orderDate;
 	
+	@Column(name = "Order_Num", nullable = false)
+    private int orderNum;
+	
 	@Column(name = "Amount", nullable = false)
 	private double amount;
 	
@@ -54,6 +57,14 @@ public class Order implements Serializable {
 		this.orderDate = orderDate;
 	}
 	
+	public int getOrderNum() {
+        return orderNum;
+    }
+
+    public void setOrderNum(int orderNum) {
+        this.orderNum = orderNum;
+    }
+    
 	public double getAmount() {
 		return amount;
 	}

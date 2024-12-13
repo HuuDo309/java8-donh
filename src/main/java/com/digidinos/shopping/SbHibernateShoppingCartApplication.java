@@ -62,7 +62,7 @@ public class SbHibernateShoppingCartApplication {
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 		
 		//Package contain entity classes
-		factoryBean.setPackagesToScan(new String[] {""});
+		factoryBean.setPackagesToScan(new String[] { "com.digidinos.shopping.entity" });
 		factoryBean.setDataSource(dataSource);
 		factoryBean.setHibernateProperties(properties);
 		factoryBean.afterPropertiesSet();
