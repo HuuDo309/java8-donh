@@ -44,8 +44,8 @@
          <div class="product-preview-container" th:each="cartLineInfo : ${myCart.cartLines}">
             <ul>
                <li>
-                  <img class="product-image"
-                     src="@{|/productImage?code=${cartLineInfo.productInfo.code}|}" />
+				  <img class="product-image" 
+				     th:src="@{/productImage(code=${cartLineInfo.productInfo.code})}" />
                </li>
                <li>
                   Code: <span th:utext="${cartLineInfo.productInfo.code}"></span>

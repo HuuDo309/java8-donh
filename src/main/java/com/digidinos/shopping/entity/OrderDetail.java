@@ -26,13 +26,13 @@ public class OrderDetail implements Serializable{
 			foreignKey = @ForeignKey(name = "ORDER_DETAIL_ORD_FK"))
 	private Order order;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "PRODUCT_ID", nullable = false, //
 			foreignKey = @ForeignKey(name = "ORDER_DETAIL_PROD_FK"))
 	private Product product;
 	
-	@Column(name = "Quanity", nullable = false)
-	private int quanity;
+	@Column(name = "Quantity", nullable = false)
+	private int quantity;
 	
 	@Column(name = "Price", nullable = false)
 	private double price;
@@ -64,12 +64,12 @@ public class OrderDetail implements Serializable{
 		this.product = product;
 	}
 	
-	public int getQuanity() {
-		return quanity;
+	public int getQuantity() {
+		return quantity;
 	}
 	
-	public void setQuanity(int quanity) {
-		this.quanity = quanity;
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 	
 	public double getPrice() {

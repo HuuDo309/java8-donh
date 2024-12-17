@@ -133,6 +133,7 @@ public class AdminController {
 		return "redirect:/productList";
 	}
 	
+	// GET: Hiển thị order.
 	@GetMapping({ "/admin/order" })
 	public String orderView(Model model, @RequestParam("orderId") String orderId) {
 		OrderInfo orderInfo = null;

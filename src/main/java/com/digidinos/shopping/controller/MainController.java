@@ -209,7 +209,6 @@ public class MainController {
 
 	// POST: Gửi đơn hàng (Save).
 	@PostMapping({ "/shoppingCartConfirmation" })
-
 	public String shoppingCartConfirmationSave(HttpServletRequest request, Model model) {
 		CartInfo cartInfo = Utils.getCartInSession(request);
 
@@ -223,7 +222,6 @@ public class MainController {
 		try {
 			orderDAO.saveOrder(cartInfo);
 		} catch (Exception e) {
-
 			return "shoppingCartConfirmation";
 		}
 

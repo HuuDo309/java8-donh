@@ -32,7 +32,7 @@ public class OrderDAO {
 	private ProductDAO productDAO;
 	
 	private int getMaxOrderNum() {
-		String sql = "Select max(o.orderNum) from " + Order.class.getName() + "o";
+		String sql = "Select max(o.orderNum) from " + Order.class.getName() + " o ";
 		Session session = this.sessionFactory.getCurrentSession();
 		Query<Integer> query = session.createQuery(sql, Integer.class);
 		Integer value = (Integer) query.getSingleResult();
@@ -69,7 +69,7 @@ public class OrderDAO {
 			detail.setOrder(order);
 			detail.setAmount(line.getAmount());
 			detail.setPrice(line.getProductInfo().getPrice());
-			detail.setQuanity(line.getQuantity());
+			detail.setQuantity(line.getQuantity());
 			
 			String code = line.getProductInfo().getCode();
 			Product product = this.productDAO.findProduct(code);
@@ -116,11 +116,11 @@ public class OrderDAO {
 	}
 	
 	public List<OrderDetailInfo> listOrderDetailInfos(String orderId) {
-		String sql = "Select new" + OrderDetailInfo.class.getName() //
-				+ "(d.id, d.product.code, d.product.name, d.quantity, d.price, d.amount)" //
-				+ "from " + OrderDetail.class.getName() + " d " //
-				+ "where d.order.id = :orderId ";
-		
+		String sql = "Select new " + OrderDetailInfo.class.getName() + 
+	             "(d.id, d.product.code, d.product.name, d.quantity, d.price, d.amount) " +
+	             "from " + OrderDetail.class.getName() + " d " +
+	             "where d.order.id = :orderId";
+
 		Session session = this.sessionFactory.getCurrentSession();
 		Query<OrderDetailInfo> query = session.createQuery(sql, OrderDetailInfo.class);
 		query.setParameter("orderId", orderId);
