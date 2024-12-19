@@ -7,6 +7,8 @@ public class ProductInfo {
 	private String code;
 	private String name;
 	private double price;
+	private byte[] image;
+	private String imageBase64;
 	
 	public ProductInfo() {
 		
@@ -19,11 +21,18 @@ public class ProductInfo {
 	}
 	
 	//Sử dụng trong JPA/Hibernate query
+	public ProductInfo(String code, String name, double price, byte[] image) {
+        this.code = code;
+        this.name = name;
+        this.price = price;
+        this.image = image;
+    }
+	
 	public ProductInfo(String code, String name, double price) {
-		this.code = code;
-		this.name = name;
-		this.price = price;
-	}
+        this.code = code;
+        this.name = name;
+        this.price = price;
+    }
 	
 	public String getCode() {
 		return code;
@@ -47,5 +56,21 @@ public class ProductInfo {
 	
 	public void setPrice(double price) {
 		this.price = price;
+	}
+	
+	public byte[] getImage() {
+		return image;
+	}
+	
+	public void setImage(byte[] image) {
+		this.image = image;
+	}
+
+	public String getImageBase64() {
+		return imageBase64;
+    }
+	
+	public void setImageBase64(String imageBase64) {
+		this.imageBase64 = imageBase64;
 	}
 }

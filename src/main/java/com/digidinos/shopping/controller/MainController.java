@@ -1,6 +1,7 @@
 package com.digidinos.shopping.controller;
 
 import java.io.IOException;
+import java.util.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -83,6 +84,37 @@ public class MainController {
 
 		model.addAttribute("paginationProducts", result);
 		return "productList";
+	}
+
+	// API trả về danh sách sản phẩm ở định dạng JSON
+	@RestController
+	@RequestMapping("/api/products")
+	public class ProductApiController {
+
+	    @Autowired
+	    private ProductDAO productDAO;
+
+	    @GetMapping
+	    public PaginationResult<ProductInfo> getProducts(
+	            @RequestParam(value = "name", defaultValue = "") String likeName,
+	            @RequestParam(value = "page", defaultValue = "1") int page) {
+
+	        final int maxResult = 8;
+	        final int maxNavigationPage = 10;
+
+	        // Lấy danh sách sản phẩm từ DAO
+	        PaginationResult<ProductInfo> result = productDAO.queryProducts(page, maxResult, maxNavigationPage, likeName);
+	        
+	        // Chuyển đổi hình ảnh thành Base64
+	        for (ProductInfo product : result.getList()) {
+	            if (product.getImage() != null && product.getImage().length > 0) {
+	                String base64Image = Base64.getEncoder().encodeToString(product.getImage());
+	                product.setImageBase64(base64Image);  
+	            }
+	        }
+
+	        return result;
+	    }
 	}
 
 	// GET: Thêm sản phẩm vào giỏ hàng theo mã (code)

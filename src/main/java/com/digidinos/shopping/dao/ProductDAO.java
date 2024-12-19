@@ -89,7 +89,7 @@ public class ProductDAO {
 
 	public PaginationResult<ProductInfo> queryProducts(int page, int maxResult, int maxNavigationPage, String likeName) {
 		String sql = "Select new " + ProductInfo.class.getName() //
-				+ "(p.code, p.name, p.price)" + " from " //
+				+ "(p.code, p.name, p.price, p.image)" + " from " //
 				+ Product.class.getName() + " p ";
 		if (likeName != null && likeName.length() > 0) {
 			sql += "Where lower(p.name) like :likeName ";
