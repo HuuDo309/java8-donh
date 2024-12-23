@@ -2,20 +2,28 @@ package com.digidinos.shopping.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+//import javax.persistence.AttributeOverride;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "Orders", //
         uniqueConstraints = { @UniqueConstraint(columnNames = "Order_Num") })
+//@AttributeOverride(name = "id", column = @Column(name = "id", nullable = false, columnDefinition = "BIGINT UNSIGNED"))
 public class Order implements Serializable {
 
     private static final long serialVersionUID = -2576670215015463100L;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetail> orderDetails;
+    
     @Id
     @Column(name = "ID", length = 50)
     private String id;

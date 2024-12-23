@@ -19,6 +19,7 @@ import com.digidinos.shopping.pagination.PaginationResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -115,6 +116,20 @@ public class OrderDAO {
 				order.getCustomerAddress(), order.getCustomerEmail(), order.getCustomerPhone());
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+	public void delete(String orderId) {
+
+	    Order order = this.findOrder(orderId);
+
+	    if (order != null) {
+	        // Xóa đơn hàng (và tự động xóa OrderDetail nhờ cascade)
+	        Session session = this.sessionFactory.getCurrentSession();
+	        session.delete(order);
+	        session.flush(); 
+	    }
+	    
+	}
+
 	public List<OrderDetailInfo> listOrderDetailInfos(String orderId) {
 		String sql = "Select new " + OrderDetailInfo.class.getName() + 
 	             "(d.id, d.product.code, d.product.name, d.quantity, d.price, d.amount) " +

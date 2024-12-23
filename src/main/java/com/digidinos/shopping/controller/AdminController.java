@@ -133,6 +133,28 @@ public class AdminController {
 		return "redirect:/productList";
 	}
 	
+	 // POST: Xóa sản phẩm
+    @PostMapping("/admin/product/delete")
+    public String deleteProduct(@RequestParam("code") String code, RedirectAttributes redirectAttributes) {
+        try {
+            Product product = productDAO.findProduct(code);
+            if (product == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Product not found.");
+                return "redirect:/admin/product";
+            }
+
+            productDAO.delete(product);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Product deleted successfully.");
+        } catch (Exception e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            String message = rootCause.getMessage();
+            redirectAttributes.addFlashAttribute("errorMessage", "Error deleting product: " + message);
+        }
+
+        return "redirect:/productList";  
+    }
+	
 	// GET: Hiển thị order.
 	@GetMapping({ "/admin/order" })
 	public String orderView(Model model, @RequestParam("orderId") String orderId) {
@@ -149,6 +171,16 @@ public class AdminController {
 		model.addAttribute("orderInfo", orderInfo);
 		
 		return "order";
+	}
+	
+	@PostMapping({ "/admin/order/delete" })
+	public String deleteOrder(@RequestParam("orderId") String orderId) {
+		try {
+	        this.orderDAO.delete(orderId);
+	    } catch (Exception e) {
+	    	
+	    }
+	    return "redirect:/admin/orderList";
 	}
 	
 }

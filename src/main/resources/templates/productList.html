@@ -28,6 +28,14 @@
                  <a style="color:red;"
                     th:href="@{|/admin/product?code=${prodInfo.code}|}">Edit Product</a>
                </li>
+			   <li>
+			     <form action="#" th:action="@{|/admin/product/delete|}" method="post" style="display:inline;">
+			       <input type="hidden" name="code" th:value="${prodInfo.code}" />
+			       <button type="submit" style="color:red; background:none; border:none; padding:0;">
+			          Delete Product
+			       </button>
+			      </form>
+			    </li>
             </th:block>
          </ul>
       </div>

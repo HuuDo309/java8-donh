@@ -1,7 +1,6 @@
 package com.digidinos.shopping.entity;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -19,12 +18,6 @@ public class BaseEntity implements Serializable {
     @Column(name = "id", nullable = false, updatable = false)
     protected String id;
 
-    protected LocalDateTime createdAt;
-    protected LocalDateTime updatedAt;
-    protected LocalDateTime deletedAt;
-    private boolean isDeleted;
-
-
     public BaseEntity() {
 
     }
@@ -37,36 +30,5 @@ public class BaseEntity implements Serializable {
         this.id = id;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
 }
 
