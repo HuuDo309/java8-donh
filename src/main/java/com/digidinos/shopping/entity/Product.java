@@ -2,11 +2,14 @@ package com.digidinos.shopping.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -16,6 +19,9 @@ import javax.persistence.TemporalType;
 public class Product implements Serializable {
 
 	private static final long serialVersionUID = -1000119078147252957L;
+	
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductReview> productReviews;
 	
 	@Id
 	@Column(name = "Code", length = 20, nullable = false)
@@ -35,7 +41,21 @@ public class Product implements Serializable {
 	@Column(name = "Create_Date", nullable = false)
 	private Date createDate;
 	
+	@Column(name = "Quantity")
+	private int quantity;
+	
+	@Column(name = "IS_DELETED", nullable = false)
+	private boolean isDeleted;
+	
 	public Product() {
+	}
+	
+	public List<ProductReview> getProductReviews() {
+		return productReviews;
+	}
+	
+	public void setProductReviews(List<ProductReview> productReviews) {
+		this.productReviews = productReviews;
 	}
 	
 	public String getCode() {
@@ -78,4 +98,20 @@ public class Product implements Serializable {
 		this.image = image;
 	}
 	
+	public int getQuantity() {
+		return quantity;
+	}
+	
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+	
+	public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+    
 }

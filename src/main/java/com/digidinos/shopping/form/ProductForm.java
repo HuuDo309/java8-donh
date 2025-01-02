@@ -7,6 +7,7 @@ public class ProductForm {
 	private String code;
 	private String name;
 	private double price;
+	private int quantity;
 	
 	private boolean newProduct = false;
 
@@ -21,6 +22,7 @@ public class ProductForm {
 		this.code = product.getCode();
 		this.name = product.getName();
 		this.price = product.getPrice();
+		this.quantity = product.getQuantity();
 	}
 	
 	public String getCode() {
@@ -53,6 +55,14 @@ public class ProductForm {
 	
 	public void setFileData(MultipartFile fileData) {
 		this.fileData = fileData;
+	}
+	
+	public int getQuantity() {
+		return quantity;
+	}
+	
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 	
 	public boolean isNewProduct() {

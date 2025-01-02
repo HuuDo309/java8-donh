@@ -10,6 +10,7 @@ import org.hibernate.query.Query;
 import com.digidinos.shopping.entity.Order;
 import com.digidinos.shopping.entity.OrderDetail;
 import com.digidinos.shopping.entity.Product;
+import com.digidinos.shopping.entity.User;
 import com.digidinos.shopping.model.CartInfo;
 import com.digidinos.shopping.model.CartLineInfo;
 import com.digidinos.shopping.model.CustomerInfo;
@@ -44,7 +45,7 @@ public class OrderDAO {
 	}
 	
 	@Transactional(rollbackFor = Exception.class)
-	public void saveOrder(CartInfo cartInfo) {
+	public void saveOrder(CartInfo cartInfo, User user) {
 		Session session = this.sessionFactory.getCurrentSession();
 		int orderNum = this.getMaxOrderNum() + 1;
 		Order order = new Order();
@@ -53,12 +54,20 @@ public class OrderDAO {
 		order.setOrderNum(orderNum);
 		order.setOrderDate(new Date());
 		order.setAmount(cartInfo.getAmountTotal());
+		order.setStatus("Chưa xác nhận");
 		
 		CustomerInfo customerInfo = cartInfo.getCustomerInfo();
 		order.setCustomerName(customerInfo.getName());
 		order.setCustomerAddress(customerInfo.getAddress());
 		order.setCustomerEmail(customerInfo.getEmail());
 		order.setCustomerPhone(customerInfo.getPhone());
+		
+		if (user != null) {
+	        order.setUser(user);  
+	        System.out.println("User ID: " + user.getId());  
+	    } else {
+	        System.out.println("User is null");
+	    }
 		
 		session.persist(order);
 		
@@ -89,7 +98,7 @@ public class OrderDAO {
 	// @page = 1, 2, ...
 	public PaginationResult<OrderInfo> listOrderInfo(int page, int maxResult, int maxNavigationPage) {
 		String sql = "Select new " + OrderInfo.class.getName() //
-				+ "(ord.id, ord.orderDate, ord.orderNum, ord.amount, "
+				+ "(ord.id, ord.orderDate, ord.orderNum, ord.amount, ord.status, "
 				+ " ord.customerName, ord.customerAddress, ord.customerEmail, ord.customerPhone) " + " from "
 				+ Order.class.getName() + " ord " //
 				+ " order by ord.orderNum desc";
@@ -111,8 +120,10 @@ public class OrderDAO {
 		if (order == null) {
 			return null;
 		}
+		 Integer userId = (order.getUser() != null) ? order.getUser().getId() : null;
+		 
 		return new OrderInfo(order.getId(), order.getOrderDate(), //
-				order.getOrderNum(), order.getAmount(), order.getCustomerName(), //
+				order.getOrderNum(), order.getAmount(), order.getStatus(), userId, order.getCustomerName(), //
 				order.getCustomerAddress(), order.getCustomerEmail(), order.getCustomerPhone());
 	}
 	
@@ -141,6 +152,56 @@ public class OrderDAO {
 		query.setParameter("orderId", orderId);
 		
 		return query.getResultList();
+	}
+	
+	@Transactional(readOnly = true)
+	public List<OrderInfo> listOrdersByUserId(Integer userId) {
+	    String sql = "Select new " + OrderInfo.class.getName() +
+	                 "(ord.id, ord.orderDate, ord.orderNum, ord.amount, ord.status, ord.user.id, " +
+	                 "ord.customerName, ord.customerAddress, ord.customerEmail, ord.customerPhone) " +
+	                 "from " + Order.class.getName() + " ord " +
+	                 "where ord.user.id = :userId " + 
+	                 "order by ord.orderNum desc";
+	    
+	    Session session = this.sessionFactory.getCurrentSession();
+	    
+	    return session.createQuery(sql, OrderInfo.class)
+	                        .setParameter("userId", userId)
+	                        .getResultList();
+	}
+	
+	public PaginationResult<OrderInfo> listOrderByUser(Integer userId, int page, int maxResult, int maxNavigationPage) {
+        String hql = "SELECT new com.digidinos.shopping.model.OrderInfo(o.id, o.orderDate, o.customerName, " +
+                     "o.customerAddress, o.customerEmail, o.amount, o.status) " +
+                     "FROM Order o WHERE o.user.id = :userId ORDER BY o.orderDate DESC";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query<OrderInfo> query = session.createQuery(hql, OrderInfo.class);
+        query.setParameter("userId", userId);
+
+        return new PaginationResult<>(query, page, maxResult, maxNavigationPage);
+    }
+	
+	public String getOrderStatus(String orderId) {
+	    String sql = "Select ord.status from " + Order.class.getName() + " ord where ord.id = :orderId";
+	    
+	    Session session = this.sessionFactory.getCurrentSession();
+	    Query<String> query = session.createQuery(sql, String.class);
+	    query.setParameter("orderId", orderId);
+	    
+	    String status = query.uniqueResult();
+	    
+	    return status != null ? status : "Status not found"; 
+	}
+
+	@Transactional
+	public void updateOrderStatus(String orderId, String status) {
+	    Session session = this.sessionFactory.getCurrentSession();
+	    Order order = session.get(Order.class, orderId);
+	    if (order != null) {
+	        order.setStatus(status); 
+	        session.update(order);
+	    }
 	}
 	
 }

@@ -25,6 +25,18 @@
                <span class="total" th:utext="${#numbers.formatDecimal(orderInfo.amount,3,2,'COMMA')}">         
                </span>
             </li>
+			<li>Status: 
+			    <form action="/updateStatus" method="post" style="display: inline;">
+			        <input type="hidden" name="orderId" th:value="${orderInfo.id}">
+			        <select name="status">
+			            <option value="Chưa xác nhận" th:selected="${orderInfo.status == 'Chưa xác nhận'}">Chưa xác nhận</option>
+			            <option value="Đã xác nhận" th:selected="${orderInfo.status == 'Đã xác nhận'}">Đã xác nhận</option>
+			            <option value="Đang giao" th:selected="${orderInfo.status == 'Đang giao'}">Đang giao</option>
+			            <option value="Đã nhận" th:selected="${orderInfo.status == 'Đã nhận'}">Đã nhận</option>
+			        </select>
+			        <button type="submit">Update</button>
+			    </form>
+			</li>
          </ul>
 		 <ul>
 			<th:block sec:authorize="hasAuthority('ROLE_MANAGER')">

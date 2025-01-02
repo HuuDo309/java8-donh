@@ -37,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// Các yêu cầu phải login với vai trò ROLE_EMPLOYEE hoặc ROLE_MANAGER.
 		// Nếu chưa login, nó sẽ redirect tới trang /admin/login.
-		http.authorizeRequests().antMatchers("/admin/orderList", "/admin/order", "/admin/accountInfo")//
+		http.authorizeRequests().antMatchers("/admin/orderList", "/admin/order")//
 				.access("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_MANAGER')");
 
 		// Các trang chỉ dành cho MANAGER
@@ -53,15 +53,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 				// 
 				.loginProcessingUrl("/j_spring_security_check") // Submit URL
-				.loginPage("/admin/login")//
-				.defaultSuccessUrl("/admin/accountInfo")//
-				.failureUrl("/admin/login?error=true")//
+				.loginPage("/login")//
+				.defaultSuccessUrl("/accountInfo")//
+				.failureUrl("/login?error=true")//
 				.usernameParameter("userName")//
 				.passwordParameter("password")
 
 				// Cấu hình cho trang Logout.
 				// (Sau khi logout, chuyển tới trang home)
-				.and().logout().logoutUrl("/admin/logout").logoutSuccessUrl("/");
+				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/");
 
 	}
 }

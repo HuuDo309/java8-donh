@@ -58,6 +58,13 @@
                <td><input type="file" th:field="*{fileData}" /></td>
                <td> </td>
             </tr>
+			<tr>
+			   <td>Quantity </td>
+			   <td><input th:field="*{quantity}"  /></td>
+			   <td>
+			      <span class="error-message" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">..</span>
+			   </td>
+			</tr>
             <tr>
                <td>&nbsp;</td>
                <td>

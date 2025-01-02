@@ -36,11 +36,16 @@
                            th:utext="${#numbers.formatDecimal(cartLineInfo.productInfo.price,3,2,'COMMA')}">
                         </span>
                      </li>
-                     <li>Quantity:
-                        <input
-                            th:name="|cartLines[${varStatus.index}].quantity|"
-                            th:value="${cartLineInfo.quantity}" />
-                     </li>
+					 <li>
+					    Quantity:
+					    <input
+					       th:name="|cartLines[${varStatus.index}].quantity|"
+					       th:value="${cartLineInfo.quantity}" />
+						<div class="error-message" th:if="${#fields.hasErrors('cartLines[' + varStatus.index + '].quantity')}">
+						   <span th:each="err : ${#fields.errors('cartLines[' + varStatus.index + '].quantity')}" 
+								 th:text="${err}"></span>
+						</div>
+					 </li>
                      <li>Subtotal:
                         <span class="subtotal"
                            th:utext="${#numbers.formatDecimal(cartLineInfo.amount,3,2,'COMMA')}">
@@ -56,8 +61,12 @@
             
             <div style="clear: both"></div>
             <input class="button-update-sc" type="submit" value="Update Quantity" />
-            <a class="navi-item"
-               th:href="@{/shoppingCartCustomer}">Enter Customer Info</a>
+			<th:block sec:authorize="!isAuthenticated()">
+			    <a class="navi-item" th:href="@{/shoppingCartCustomer}">Enter Customer Info</a>
+			</th:block>
+			<th:block sec:authorize="isAuthenticated()">
+			    <a class="navi-item" th:href="@{/shoppingCartConfirmation}">Order</a>
+			</th:block>
             <a class="navi-item"
                th:href="@{/productList}">Continue Buy</a>
          </form>

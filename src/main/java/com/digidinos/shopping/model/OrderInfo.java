@@ -9,7 +9,8 @@ public class OrderInfo {
 	private Date orderDate;
 	private int orderNum;
 	private double amount;
-	
+	private String status;
+	private Integer userId;
 	private String customerName;
 	private String customerAddress;
 	private String customerEmail;
@@ -23,16 +24,43 @@ public class OrderInfo {
 	
 	//Sử dụng cho Hibernate Query.
 	public OrderInfo(String id, Date orderDate, int orderNum, //
-			double amount, String customerName, String customerAddress, //
+			double amount, String status,Integer userId, String customerName, String customerAddress, //
 			String customerEmail, String customerPhone) {
 		this.id = id;
 		this.orderDate = orderDate;
 		this.orderNum = orderNum;
 		this.amount = amount;
+		this.status = status;
+		this.userId = userId;
 		this.customerName = customerName;
 		this.customerAddress = customerAddress;
 		this.customerEmail = customerEmail;
 		this.customerPhone = customerPhone;
+	}
+	
+	public OrderInfo(String id, Date orderDate, int orderNum, //
+            double amount,String status, String customerName, String customerAddress, //
+            String customerEmail, String customerPhone) {
+        this.id = id;
+        this.orderDate = orderDate;
+        this.orderNum = orderNum;
+        this.amount = amount;
+        this.status = status;
+        this.customerName = customerName;
+        this.customerAddress = customerAddress;
+        this.customerEmail = customerEmail;
+        this.customerPhone = customerPhone;
+    }
+	
+	public OrderInfo(String id, Date orderDate, String customerName, String customerAddress, 
+            String customerEmail, double amount, String status) {
+		this.id = id;
+		this.orderDate = orderDate;
+		this.customerName = customerName;
+		this.customerAddress = customerAddress;
+		this.customerEmail = customerEmail;
+		this.amount = amount;
+		this.status = status;
 	}
 	
 	public String getId() {
@@ -65,6 +93,22 @@ public class OrderInfo {
 	
 	public void setAmount(double amount) {
 		this.amount = amount;
+	}
+	
+	public String getStatus() {
+		return status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	public Integer getUserId() {
+		return userId;
+	}
+	
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
 	
 	public String getCustomerName() {

@@ -1,7 +1,9 @@
 package com.digidinos.shopping.controller;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Base64;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,12 +11,18 @@ import javax.servlet.http.HttpServletResponse;
 import com.digidinos.shopping.dao.OrderDAO;
 import com.digidinos.shopping.dao.ProductDAO;
 import com.digidinos.shopping.entity.Product;
+import com.digidinos.shopping.entity.User;
 import com.digidinos.shopping.form.CustomerForm;
 import com.digidinos.shopping.model.CartInfo;
 import com.digidinos.shopping.model.CustomerInfo;
+import com.digidinos.shopping.model.OrderDetailInfo;
+import com.digidinos.shopping.model.OrderInfo;
 import com.digidinos.shopping.model.ProductInfo;
 import com.digidinos.shopping.pagination.PaginationResult;
+import com.digidinos.shopping.service.OrderService;
+import com.digidinos.shopping.service.UserServiceImpl;
 import com.digidinos.shopping.utils.Utils;
+import com.digidinos.shopping.validator.CartFormValidator;
 import com.digidinos.shopping.validator.CustomerFormValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,6 +46,15 @@ public class MainController {
 
 	@Autowired
 	private CustomerFormValidator customerFormValidator;
+	
+	@Autowired
+	private CartFormValidator cartFormValidator;
+	
+	@Autowired
+	private UserServiceImpl userService;
+	
+	@Autowired
+	private OrderService orderService;
 
 	@InitBinder
 	public void myInitBinder(WebDataBinder dataBinder) {
@@ -50,7 +67,7 @@ public class MainController {
 		// Trường hợp update SL trên giỏ hàng.
 		// (@ModelAttribute("cartForm") @Validated CartInfo cartForm)
 		if (target.getClass() == CartInfo.class) {
-
+			dataBinder.setValidator(cartFormValidator);
 		}
 
 		// Trường hợp save thông tin khách hàng.
@@ -164,8 +181,13 @@ public class MainController {
 	@PostMapping({ "/shoppingCart" })
 	public String shoppingCartUpdateQty(HttpServletRequest request, //
 			Model model, //
-			@ModelAttribute("cartForm") CartInfo cartForm) {
+			@ModelAttribute("cartForm") @Validated CartInfo cartForm,
+			BindingResult result) {
 
+		if (result.hasErrors()) {
+	        return "shoppingCart";
+	    }
+		
 		CartInfo cartInfo = Utils.getCartInSession(request);
 		cartInfo.updateQuantity(cartForm);
 
@@ -224,46 +246,75 @@ public class MainController {
 
 	// GET: Xem lại thông tin để xác nhận.
 	@GetMapping({ "/shoppingCartConfirmation" })
-	public String shoppingCartConfirmationReview(HttpServletRequest request, Model model) {
+	public String shoppingCartConfirmationReview(HttpServletRequest request, Model model, Principal principal) {
 		CartInfo cartInfo = Utils.getCartInSession(request);
 
-		if (cartInfo == null || cartInfo.isEmpty()) {
+	    if (cartInfo == null || cartInfo.isEmpty()) {
+	        return "redirect:/shoppingCart";
+	    } 
 
-			return "redirect:/shoppingCart";
-		} else if (!cartInfo.isValidCustomer()) {
+	    if (principal != null && !cartInfo.isValidCustomer()) {
+	        String username = principal.getName();
+	        User user = userService.findUserByUserName(username);
 
-			return "redirect:/shoppingCartCustomer";
-		}
-		model.addAttribute("myCart", cartInfo);
+	        CustomerInfo customerInfo = new CustomerInfo();
+	        customerInfo.setName(user.getFullName());
+	        customerInfo.setEmail(user.getEmail());
+	        customerInfo.setPhone(user.getPhone());
+	        customerInfo.setAddress(user.getAddress());
 
-		return "shoppingCartConfirmation";
+	        cartInfo.setCustomerInfo(customerInfo);
+	    }
+
+	    if (!cartInfo.isValidCustomer()) {
+	        return "redirect:/shoppingCartCustomer";
+	    }
+
+	    model.addAttribute("myCart", cartInfo);
+	    return "shoppingCartConfirmation";
 	}
 
 	// POST: Gửi đơn hàng (Save).
 	@PostMapping({ "/shoppingCartConfirmation" })
-	public String shoppingCartConfirmationSave(HttpServletRequest request, Model model) {
+	public String shoppingCartConfirmationSave(HttpServletRequest request, Model model, Principal principal) {
 		CartInfo cartInfo = Utils.getCartInSession(request);
 
-		if (cartInfo.isEmpty()) {
+	    if (cartInfo == null || cartInfo.isEmpty()) {
+	        return "redirect:/shoppingCart";
+	    }
 
-			return "redirect:/shoppingCart";
-		} else if (!cartInfo.isValidCustomer()) {
+	    User user = null;
+	    if (principal != null && !cartInfo.isValidCustomer()) {
+	        String username = principal.getName();
+	        user = userService.findUserByUserName(username);
+	        
+	        CustomerInfo customerInfo = new CustomerInfo();
+	        customerInfo.setName(user.getFullName());
+	        customerInfo.setEmail(user.getEmail());
+	        customerInfo.setPhone(user.getPhone());
+	        customerInfo.setAddress(user.getAddress());
 
-			return "redirect:/shoppingCartCustomer";
-		}
-		try {
-			orderDAO.saveOrder(cartInfo);
-		} catch (Exception e) {
-			return "shoppingCartConfirmation";
-		}
+	        cartInfo.setCustomerInfo(customerInfo);
+	    }
 
-		// Xóa giỏ hàng khỏi session.
-		Utils.removeCartInSession(request);
+	    if (!cartInfo.isValidCustomer()) {
+	        return "redirect:/shoppingCartCustomer";
+	    }
 
-		// Lưu thông tin đơn hàng cuối đã xác nhận mua.
-		Utils.storeLastOrderedCartInSession(request, cartInfo);
+	    try {
+	        orderDAO.saveOrder(cartInfo, user);
+	    } catch (Exception e) {
+	        model.addAttribute("errorMessage", "Error occurred while saving your order. Please try again.");
+	        return "shoppingCartConfirmation";
+	    }
 
-		return "redirect:/shoppingCartFinalize";
+	    // Xóa giỏ hàng khỏi session.
+	    Utils.removeCartInSession(request);
+
+	    // Lưu thông tin đơn hàng cuối đã xác nhận mua.
+	    Utils.storeLastOrderedCartInSession(request, cartInfo);
+
+	    return "redirect:/shoppingCartFinalize";
 	}
 
 	// GET: Thông tin đơn hàng cuối cùng 
@@ -277,6 +328,43 @@ public class MainController {
 		}
 		model.addAttribute("lastOrderedCart", lastOrderedCart);
 		return "shoppingCartFinalize";
+	}
+	
+	@GetMapping({ "/myOrderList" })
+	public String listUserOrders(@RequestParam(defaultValue = "1") int page,
+	                              @RequestParam(defaultValue = "5") int maxResult,
+	                              @RequestParam(defaultValue = "5") int maxNavigationPage,
+	                              Principal principal,
+	                              Model model) {
+	    String username = principal.getName();
+	    User user = userService.findUserByUserName(username); 
+
+	    PaginationResult<OrderInfo> paginationResult = orderService.getOrdersByUserId(user.getId(), page, maxResult, maxNavigationPage);
+	    model.addAttribute("paginationResult", paginationResult);
+	    return "myOrderList";
+	}
+	
+	@GetMapping({ "/myOrder" })
+	public String viewOrderDetails(@RequestParam("orderId") String orderId, Principal principal, Model model) {
+	    String username = principal.getName();
+	    User user = userService.findUserByUserName(username); 
+
+	    OrderInfo orderInfo = orderService.getOrderById(orderId);
+
+	    if (orderInfo == null || !orderInfo.getUserId().equals(user.getId())) {
+	        return "redirect:/myOrderList"; 
+	    }
+
+
+	    List<OrderDetailInfo> details = orderService.getOrderDetails(orderId);
+	    orderInfo.setDetails(details);
+
+	    String orderStatus = orderService.getOrderStatus(orderId);
+
+	    model.addAttribute("orderInfo", orderInfo);
+	    model.addAttribute("orderStatus", orderStatus);
+
+	    return "myOrder"; 
 	}
 
 	// GET: Hiển thị hình ảnh sản phẩm theo mã (code)

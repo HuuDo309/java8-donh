@@ -41,6 +41,16 @@ public class ProductFormValidator implements Validator {
 				}
 			}
 		}
+		
+		try {
+	        int quantity = productForm.getQuantity();  
+	        if (quantity < 0) {
+	            errors.rejectValue("quantity", "Negative.productForm.quantity");  
+	        }
+	    } catch (Exception e) {
+	        errors.rejectValue("quantity", "TypeMismatch.productForm.quantity");
+	    }
+	    
 	}
 
 }
