@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Write Review</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+</head>
+<body>
+
+    <th:block th:include="/_header"></th:block>
+    <th:block th:include="/_menu"></th:block>
+    
+    <div class="page-title">Write Review</div>
+    
+    <form th:action="@{|/review?code=${reviewForm.productId}&orderId=${orderId}|}" th:object="${reviewForm}" method="post">
+		<input type="hidden" name="orderId" th:value="${orderId}" />
+        <table style="text-align:left;">
+            <tr>
+                <td>Product Code</td>
+                <td>
+                    <span th:text="${reviewForm.productId}"></span>
+                    <input type="hidden" th:field="*{productId}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Rating *</td>
+                <td><input type="number" th:field="*{rating}" min="1" max="5" required/></td>
+            </tr>
+            <tr>
+                <td>Comment *</td>
+                <td><textarea th:field="*{comment}" required></textarea></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>
+                    <input type="submit" value="Submit" />
+                    <input type="reset" value="Reset" />
+                </td>
+            </tr>
+        </table>
+    </form>
+    
+    <th:block th:include="/_footer"></th:block>
+
+</body>
+</html>

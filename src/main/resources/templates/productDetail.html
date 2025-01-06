@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Details</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+</head>
+<body>
+    <th:block th:include="/_header"></th:block>
+    <th:block th:include="/_menu"></th:block>
+
+    <div class="page-title">Product Details</div>
+
+    <div class="product-info-container">
+        <h3>Product Information:</h3>
+        <ul>
+			<li><img class="product-image"
+			               th:src="@{|/productImage?code=${product.code}|}" /></li>
+            <li>Product Code: <span th:text="${product.code}"></span></li>
+            <li>Product Name: <span th:text="${product.name}"></span></li>
+            <li>Price: <span th:text="${#numbers.formatDecimal(product.price,3,2,'COMMA')}"></span></li>
+            <li>Quantity: <span th:text="${product.quantity}"></span></li>
+        </ul>
+    </div>
+
+    <h3>Reviews:</h3>
+
+    <div class="reviews-container">
+        <ul>
+            <li th:each="review : ${reviews}">
+                <div>
+                    <strong>Rating:</strong> <span th:text="${review.rating}"></span>
+                </div>
+                <div>
+                    <strong>Comment:</strong> <span th:text="${review.comment}"></span>
+                </div>
+                <hr/>
+            </li>
+        </ul>
+    </div>
+
+    <th:block th:include="/_footer"></th:block>
+</body>
+</html>
